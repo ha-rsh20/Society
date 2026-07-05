@@ -17,9 +17,9 @@ function App() {
   const { authenticated, setAuthenticated } =
     React.useContext(AuthenticatedContext);
   useState(() => {
-    console.log("Checking authentication status...");
-
-    fetch(import.meta.env.BACKEND_URL + "auth/me", { credentials: "include" })
+    fetch(import.meta.env.VITE_BACKEND_URL + "auth/me", {
+      credentials: "include",
+    })
       .then((res) => {
         if (res.status === 200) {
           setAuthenticated(true);

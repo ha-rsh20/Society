@@ -42,12 +42,15 @@ function Authentication(props) {
       password,
     };
 
-    const res = await fetch(import.meta.env.BACKEND_URL + "auth/register", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-      body: JSON.stringify(newUser),
-    });
+    const res = await fetch(
+      import.meta.env.VITE_BACKEND_URL + "auth/register",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify(newUser),
+      },
+    );
 
     if (res.ok) {
       toast.success("Registration Successful!", {
@@ -99,7 +102,7 @@ function Authentication(props) {
     };
     let accessToken, refreshToken;
 
-    const res = await fetch(import.meta.env.BACKEND_URL + "auth/login", {
+    const res = await fetch(import.meta.env.VITE_BACKEND_URL + "auth/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(cred),
@@ -166,7 +169,7 @@ function Authentication(props) {
   const authenticateEmail = () => {
     setSOTP(true);
 
-    fetch(import.meta.env.BACKEND_URL + `auth/sendMail/${email}`, {
+    fetch(import.meta.env.VITE_BACKEND_URL + `auth/sendMail/${email}`, {
       credentials: "include",
     })
       .then((res) => {
@@ -202,7 +205,7 @@ function Authentication(props) {
     e.preventDefault();
 
     console.log("Verifying OTP:", otp);
-    fetch(import.meta.env.BACKEND_URL + `auth/verifyOTP`, {
+    fetch(import.meta.env.VITE_BACKEND_URL + `auth/verifyOTP`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       credentials: "include",

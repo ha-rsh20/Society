@@ -10,7 +10,9 @@ function Protected(props) {
 
   const navigate = useNavigate();
 
-  return authenticated == true ? (
+  console.log("Authenticated:", authenticated);
+
+  return authenticated === true ? (
     props.Component.name === "Authentication" ? (
       navigate("/")
     ) : (

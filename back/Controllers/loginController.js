@@ -4,7 +4,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
 const login = (req, res) => {
-  //console.log("Login request received for email:", req.body.email);
+  console.log("Login request received for email:", req.body.email);
   user
     .findOne({ email: req.body.email })
     .then(async (data) => {

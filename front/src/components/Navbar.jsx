@@ -13,14 +13,16 @@ function Navbar() {
 
   const toggleMode = () => {
     if (mode == "Light") {
+      localStorage.setItem("theme", "Night");
       setMode("Night");
     } else {
+      localStorage.setItem("theme", "Light");
       setMode("Light");
     }
   };
 
   const handleLogout = () => {
-    fetch(import.meta.env.BACKEND_URL + "auth/logout", {
+    fetch(import.meta.env.VITE_BACKEND_URL + "auth/logout", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       credentials: "include",

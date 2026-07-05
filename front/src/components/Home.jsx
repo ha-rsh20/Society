@@ -19,13 +19,15 @@ function Home() {
   };
 
   const handleDeleteMember = (member) => {
-    fetch(import.meta.env.BACKEND_URL + `api/members/${member.homeNumber}`, {
-      method: "DELETE",
-      credentials: "include",
-    })
+    fetch(
+      import.meta.env.VITE_BACKEND_URL + `api/members/${member.homeNumber}`,
+      {
+        method: "DELETE",
+        credentials: "include",
+      },
+    )
       .then((res) => res.json())
       .then((data) => {
-        console.log(data);
         setMembers((prevMembers) =>
           prevMembers.filter((m) => m.homeNumber !== member.homeNumber),
         );
@@ -36,12 +38,11 @@ function Home() {
   };
 
   React.useEffect(() => {
-    fetch(import.meta.env.BACKEND_URL + "api/members", {
+    fetch(import.meta.env.VITE_BACKEND_URL + "api/members", {
       credentials: "include",
     })
       .then((res) => res.json())
       .then((data) => {
-        console.log(data);
         setMembers(data);
       })
       .catch((err) => {

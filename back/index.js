@@ -12,6 +12,7 @@ const app = express();
 DBConnect();
 
 app.use(express.json());
+console.log("Cross Origin:", process.env.CROSS_ORIGIN);
 //Allow Cors
 app.use(
   cors({
