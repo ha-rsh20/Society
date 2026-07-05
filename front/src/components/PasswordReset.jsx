@@ -19,7 +19,7 @@ function PasswordReset(props) {
   const getPasswordChangeOTP = (e) => {
     e.preventDefault();
 
-    fetch(`http://localhost:4000/auth/sendMail/${email}/1`, {
+    fetch(import.meta.env.BACKEND_URL + `auth/sendMail/${email}/1`, {
       method: "GET",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
@@ -67,7 +67,7 @@ function PasswordReset(props) {
   const verifyOTP = (e) => {
     e.preventDefault();
 
-    fetch(`http://localhost:4000/auth/verifyOTP`, {
+    fetch(import.meta.env.BACKEND_URL + `auth/verifyOTP`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
@@ -101,7 +101,7 @@ function PasswordReset(props) {
       password: password,
     };
 
-    fetch("http://localhost:4000/auth/password/reset", {
+    fetch(import.meta.env.BACKEND_URL + "auth/password/reset", {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       credentials: "include",

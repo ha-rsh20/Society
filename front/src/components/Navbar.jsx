@@ -20,7 +20,7 @@ function Navbar() {
   };
 
   const handleLogout = () => {
-    fetch("http://localhost:4000/auth/logout", {
+    fetch(import.meta.env.BACKEND_URL + "auth/logout", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       credentials: "include",

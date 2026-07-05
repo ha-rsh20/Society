@@ -19,7 +19,7 @@ function App() {
   useState(() => {
     console.log("Checking authentication status...");
 
-    fetch("http://localhost:4000/auth/me", { credentials: "include" })
+    fetch(import.meta.env.BACKEND_URL + "auth/me", { credentials: "include" })
       .then((res) => {
         if (res.status === 200) {
           setAuthenticated(true);

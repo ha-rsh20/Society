@@ -30,7 +30,7 @@ export default function AddMember() {
       maintenance: maintenance,
     };
 
-    const res = await fetch("http://localhost:4000/api/members", {
+    const res = await fetch(import.meta.env.BACKEND_URL + "api/members", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

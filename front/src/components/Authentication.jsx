@@ -42,7 +42,7 @@ function Authentication(props) {
       password,
     };
 
-    const res = await fetch("http://localhost:4000/auth/register", {
+    const res = await fetch(import.meta.env.BACKEND_URL + "auth/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
@@ -99,7 +99,7 @@ function Authentication(props) {
     };
     let accessToken, refreshToken;
 
-    const res = await fetch("http://localhost:4000/auth/login", {
+    const res = await fetch(import.meta.env.BACKEND_URL + "auth/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(cred),
@@ -166,7 +166,7 @@ function Authentication(props) {
   const authenticateEmail = () => {
     setSOTP(true);
 
-    fetch(`http://localhost:4000/auth/sendMail/${email}`, {
+    fetch(import.meta.env.BACKEND_URL + `auth/sendMail/${email}`, {
       credentials: "include",
     })
       .then((res) => {
@@ -202,7 +202,7 @@ function Authentication(props) {
     e.preventDefault();
 
     console.log("Verifying OTP:", otp);
-    fetch(`http://localhost:4000/auth/verifyOTP`, {
+    fetch(import.meta.env.BACKEND_URL + `auth/verifyOTP`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       credentials: "include",

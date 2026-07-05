@@ -31,7 +31,7 @@ function UpdateMember() {
     };
 
     const res = await fetch(
-      `http://localhost:4000/api/members/${member.homeNumber}`,
+      import.meta.env.BACKEND_URL + `api/members/${member.homeNumber}`,
       {
         method: "PUT",
         headers: {

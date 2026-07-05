@@ -19,7 +19,7 @@ function Home() {
   };
 
   const handleDeleteMember = (member) => {
-    fetch(`http://localhost:4000/api/members/${member.homeNumber}`, {
+    fetch(import.meta.env.BACKEND_URL + `api/members/${member.homeNumber}`, {
       method: "DELETE",
       credentials: "include",
     })
@@ -36,7 +36,9 @@ function Home() {
   };
 
   React.useEffect(() => {
-    fetch("http://localhost:4000/api/members", { credentials: "include" })
+    fetch(import.meta.env.BACKEND_URL + "api/members", {
+      credentials: "include",
+    })
       .then((res) => res.json())
       .then((data) => {
         console.log(data);
