@@ -1,4 +1,5 @@
 const express = require("express");
+require("dotenv").config();
 const DBConnect = require("./Config/dbcon");
 const memberRoute = require("./Routes/memberRoutes");
 const authRoute = require("./Routes/authRoutes");
@@ -14,7 +15,7 @@ app.use(express.json());
 //Allow Cors
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: process.env.CROSS_ORIGIN,
     credentials: true,
   }),
 );
@@ -24,6 +25,6 @@ app.use("/api", isAuthenticated, memberRoute);
 app.use("/auth", authRoute);
 
 //Start the Server
-app.listen(4000, () => {
-  console.log("Server is running on port 4000");
+app.listen(8000, () => {
+  console.log("Server is running on port 8000");
 });
