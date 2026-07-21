@@ -3,6 +3,9 @@ const dotenv = require("dotenv");
 const nodemailer = require("nodemailer");
 const user = require("../Schema/user");
 const otpGenerator = require("./generateOTP");
+const dns = require("dns");
+
+dns.lookup("smtp.gmail.com", { all: true }, console.log);
 
 dotenv.config();
 
@@ -10,7 +13,7 @@ let transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST,
   port: process.env.SMTP_PORT,
   family: 4,
-  secure: prcess.env.SMTP_SECURE == "true" ? true : false,
+  secure: process.env.SMTP_SECURE == "true" ? true : false,
   auth: {
     user: process.env.SMTP_MAIL,
     pass: process.env.SMTP_PASSWORD,
