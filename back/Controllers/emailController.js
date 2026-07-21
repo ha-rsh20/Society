@@ -20,16 +20,16 @@ let transporter = nodemailer.createTransport({
   },
 });
 
-try {
-  await transporter.verify();
-  console.log("SMTP server is ready");
-} catch (err) {
-  console.error(err);
-}
-
 let otp;
 
 const sendEmail = expressAsyncHandler(async (req, res) => {
+  try {
+    await transporter.verify();
+    console.log("SMTP server is ready");
+  } catch (err) {
+    console.error(err);
+  }
+
   const mail = process.env.SMTP_MAIL;
   const mail_to = req.params.mail;
   const reset = req.params.reset;
