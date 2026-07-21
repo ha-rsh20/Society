@@ -39,19 +39,23 @@ const sendEmail = expressAsyncHandler(async (req, res) => {
   console.log("Sending email to:", mail_to, "with OTP:", otp);
 
   if (reset !== undefined) {
+    console.log("Reset password requested for email:", mail_to);
     user
       .findOne({ email: req.params.mail })
       .then((data) => {
         if (data) {
+          console.log("User found for reset:", data.email);
           transporter.sendMail(mailOptions, (err, info) => {
             if (err) {
               console.log("Error sending email in reset:", err);
               res.status(500).send();
             } else {
               res.status(200).send();
+              console.log("Reset email sent successfully to:", mail_to);
             }
           });
         } else {
+          console.log("No user found for reset with email:", mail_to);
           res.status(204).send();
         }
       })
@@ -60,12 +64,14 @@ const sendEmail = expressAsyncHandler(async (req, res) => {
         res.sendStatus(500);
       });
   } else {
+    console.log("Sending OTP email to:", mail_to);
     transporter.sendMail(mailOptions, (err, info) => {
       if (err) {
         console.log("Error sending email:", err);
         res.status(500).send();
       } else {
         res.status(200).send();
+        console.log("OTP email sent successfully to:", mail_to);
       }
     });
   }
