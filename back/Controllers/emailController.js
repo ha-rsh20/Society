@@ -12,8 +12,10 @@ dotenv.config();
 let transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST,
   port: process.env.SMTP_PORT,
-  family: 4,
   secure: process.env.SMTP_SECURE == "true" ? true : false,
+  requireTLS: process.env.SMTP_REQUIRE_TLS == "true" ? true : false,
+  logger: true,
+  debug: true,
   auth: {
     user: process.env.SMTP_MAIL,
     pass: process.env.SMTP_PASSWORD,
@@ -24,7 +26,14 @@ let otp;
 
 const sendEmail = expressAsyncHandler(async (req, res) => {
   try {
-    await transporter.verify();
+    await transporter.verify((err, success) => {
+      if (err) {
+        console.error("Error verifying SMTP transporter:", err);
+        res.status(500).send();
+      } else {
+        console.log("SMTP transporter verified successfully");
+      }
+    });
     console.log("SMTP server is ready");
   } catch (err) {
     console.error(err);
