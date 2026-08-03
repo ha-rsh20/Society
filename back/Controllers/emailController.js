@@ -135,7 +135,7 @@ const sendEmail = expressAsyncHandler(async (req, res) => {
               "Email sent successfully! Message ID:",
               response.data.id,
             );
-            return response.data;
+            res.status(200).send();
           } catch (error) {
             console.error("Failed to send email via Gmail API:", error);
             throw error;
@@ -168,7 +168,7 @@ const sendEmail = expressAsyncHandler(async (req, res) => {
         },
       });
       console.log("Email sent successfully! Message ID:", response.data.id);
-      return response.data;
+      res.status(200).send();
     } catch (error) {
       console.error("Failed to send email via Gmail API:", error);
       throw error;
