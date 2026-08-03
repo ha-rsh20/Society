@@ -4,6 +4,8 @@ const nodemailer = require("nodemailer");
 const user = require("../Schema/user");
 const otpGenerator = require("./generateOTP");
 const dns = require("dns");
+const { gmail } = require("@googleapis/gmail");
+const { OAuth2Client } = require("google-auth-library");
 
 // dns.lookup("smtp.gmail.com", { all: true }, console.log);
 
@@ -22,33 +24,63 @@ dotenv.config();
 //   },
 // });
 
-let transporter = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    type: "OAuth2",
-    user: process.env.SMTP_MAIL,
-    clientId: process.env.GMAIL_OAUTH_CLIENT_ID,
-    clientSecret: process.env.GMAIL_OAUTH_CLIENT_SECRET,
-    refreshToken: process.env.GMAIL_OAUTH_REFRESH_TOKEN,
-  },
+// let transporter = nodemailer.createTransport({
+//   service: "gmail",
+//   auth: {
+//     type: "OAuth2",
+//     user: process.env.SMTP_MAIL,
+//     clientId: process.env.GMAIL_OAUTH_CLIENT_ID,
+//     clientSecret: process.env.GMAIL_OAUTH_CLIENT_SECRET,
+//     refreshToken: process.env.GMAIL_OAUTH_REFRESH_TOKEN,
+//   },
+// });
+
+const oAuth2Client = new OAuth2Client(
+  process.env.GMAIL_OAUTH_CLIENT_ID,
+  process.env.GMAIL_OAUTH_CLIENT_SECRET,
+  "https://google.com", // Redirect URI used in setup
+);
+
+oAuth2Client.setCredentials({
+  refresh_token: process.env.GMAIL_OAUTH_REFRESH_TOKEN,
 });
 
 let otp;
 
+const makeBody = (to, from, subject, message) => {
+  const str = [
+    `To: ${to}`,
+    `From: ${from}`,
+    `Subject: ${subject}`,
+    "MIME-Version: 1.0",
+    "Content-Type: text/html; charset=utf-8",
+    "",
+    message,
+  ].join("\n");
+
+  // Gmail API requires the email string to be base64url encoded
+  return Buffer.from(str)
+    .toString("base64")
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_")
+    .replace(/=+$/, "");
+};
+
 const sendEmail = expressAsyncHandler(async (req, res) => {
-  try {
-    await transporter.verify((err, success) => {
-      if (err) {
-        console.error("Error verifying SMTP transporter:", err);
-        res.status(500).send();
-      } else {
-        console.log("SMTP transporter verified successfully");
-      }
-    });
-    console.log("SMTP server is ready");
-  } catch (err) {
-    console.error(err);
-  }
+  const gmailClient = gmail({ version: "v1", auth: oAuth2Client });
+  // try {
+  //   await transporter.verify((err, success) => {
+  //     if (err) {
+  //       console.error("Error verifying SMTP transporter:", err);
+  //       res.status(500).send();
+  //     } else {
+  //       console.log("SMTP transporter verified successfully");
+  //     }
+  //   });
+  //   console.log("SMTP server is ready");
+  // } catch (err) {
+  //   console.error(err);
+  // }
 
   const mail = process.env.SMTP_MAIL;
   const mail_to = req.params.mail;
@@ -65,24 +97,49 @@ const sendEmail = expressAsyncHandler(async (req, res) => {
     text: `Your OTP is ${otp}`,
   };
 
+  const rawMessage = makeBody(
+    mail_to, // Target recipient
+    process.env.SMTP_MAIL, // Your authenticated Gmail account
+    reset === undefined
+      ? "OTP for email authentication"
+      : "OTP to reset password", // Email Subject
+    `Your OTP is ${otp}`,
+  );
+
   console.log("Sending email to:", mail_to, "with OTP:", otp);
 
   if (reset !== undefined) {
     console.log("Reset password requested for email:", mail_to);
     user
       .findOne({ email: req.params.mail })
-      .then((data) => {
+      .then(async (data) => {
         if (data) {
           console.log("User found for reset:", data.email);
-          transporter.sendMail(mailOptions, (err, info) => {
-            if (err) {
-              console.log("Error sending email in reset:", err);
-              res.status(500).send();
-            } else {
-              res.status(200).send();
-              console.log("Reset email sent successfully to:", mail_to);
-            }
-          });
+          // transporter.sendMail(mailOptions, (err, info) => {
+          //   if (err) {
+          //     console.log("Error sending email in reset:", err);
+          //     res.status(500).send();
+          //   } else {
+          //     res.status(200).send();
+          //     console.log("Reset email sent successfully to:", mail_to);
+          //   }
+          // });
+          try {
+            const response = await gmailClient.users.messages.send({
+              userId: "me",
+              requestBody: {
+                raw: rawMessage,
+              },
+            });
+            console.log(
+              "Email sent successfully! Message ID:",
+              response.data.id,
+            );
+            return response.data;
+          } catch (error) {
+            console.error("Failed to send email via Gmail API:", error);
+            throw error;
+          }
         } else {
           console.log("No user found for reset with email:", mail_to);
           res.status(204).send();
@@ -94,15 +151,28 @@ const sendEmail = expressAsyncHandler(async (req, res) => {
       });
   } else {
     console.log("Sending OTP email to:", mail_to);
-    transporter.sendMail(mailOptions, (err, info) => {
-      if (err) {
-        console.log("Error sending email:", err);
-        res.status(500).send();
-      } else {
-        res.status(200).send();
-        console.log("OTP email sent successfully to:", mail_to);
-      }
-    });
+    // transporter.sendMail(mailOptions, (err, info) => {
+    //   if (err) {
+    //     console.log("Error sending email:", err);
+    //     res.status(500).send();
+    //   } else {
+    //     res.status(200).send();
+    //     console.log("OTP email sent successfully to:", mail_to);
+    //   }
+    // });
+    try {
+      const response = await gmailClient.users.messages.send({
+        userId: "me",
+        requestBody: {
+          raw: rawMessage,
+        },
+      });
+      console.log("Email sent successfully! Message ID:", response.data.id);
+      return response.data;
+    } catch (error) {
+      console.error("Failed to send email via Gmail API:", error);
+      throw error;
+    }
   }
 });
 
