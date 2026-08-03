@@ -4,9 +4,6 @@ const nodemailer = require("nodemailer");
 const user = require("../Schema/user");
 const otpGenerator = require("./generateOTP");
 const dns = require("dns");
-const { Resend } = require("resend");
-
-const resend = new Resend(process.env.RESEND_API_KEY);
 
 // dns.lookup("smtp.gmail.com", { all: true }, console.log);
 
