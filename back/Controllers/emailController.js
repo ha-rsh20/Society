@@ -4,21 +4,35 @@ const nodemailer = require("nodemailer");
 const user = require("../Schema/user");
 const otpGenerator = require("./generateOTP");
 const dns = require("dns");
+const { Resend } = require("resend");
 
-dns.lookup("smtp.gmail.com", { all: true }, console.log);
+const resend = new Resend(process.env.RESEND_API_KEY);
+
+// dns.lookup("smtp.gmail.com", { all: true }, console.log);
 
 dotenv.config();
 
+// let transporter = nodemailer.createTransport({
+//   host: process.env.SMTP_HOST,
+//   port: process.env.SMTP_PORT,
+//   secure: process.env.SMTP_SECURE == "true" ? true : false,
+//   requireTLS: process.env.SMTP_REQUIRE_TLS == "true" ? true : false,
+//   logger: true,
+//   debug: true,
+//   auth: {
+//     user: process.env.SMTP_MAIL,
+//     pass: process.env.SMTP_PASSWORD,
+//   },
+// });
+
 let transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST,
-  port: process.env.SMTP_PORT,
-  secure: process.env.SMTP_SECURE == "true" ? true : false,
-  requireTLS: process.env.SMTP_REQUIRE_TLS == "true" ? true : false,
-  logger: true,
-  debug: true,
+  service: "gmail",
   auth: {
+    type: "OAuth2",
     user: process.env.SMTP_MAIL,
-    pass: process.env.SMTP_PASSWORD,
+    clientId: process.env.GMAIL_OAUTH_CLIENT_ID,
+    clientSecret: process.env.GMAIL_OAUTH_CLIENT_SECRET,
+    refreshToken: process.env.GMAIL_OAUTH_REFRESH_TOKEN,
   },
 });
 
