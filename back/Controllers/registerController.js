@@ -22,6 +22,9 @@ const register = async (req, res) => {
 
   if (error) {
     //using code 202 for error user already registered
+    logActivity(
+      `----User already registered with email: ${req.body.email}----`,
+    );
     res.sendStatus(202);
   } else {
     let newUserId = users.length === 0 ? 1 : users[users.length - 1].id + 1;
@@ -42,9 +45,13 @@ const register = async (req, res) => {
     newUser
       .save()
       .then(() => {
+        logActivity(
+          `----New user registered with email: ${req.body.email}----`,
+        );
         res.status(200).send();
       })
       .catch((err) => {
+        logActivity(`----Error registering user: ${err}----`);
         res.status(500).send();
         console.log(err);
       });
@@ -56,9 +63,13 @@ const posts = (req, res) => {
   user
     .findOne({ email: res.locals.email })
     .then((data) => {
+      logActivity(`----User ${res.locals.email} accessed posts----`);
       res.status(201).send(data);
     })
     .catch((err) => {
+      logActivity(
+        `----Error accessing posts for user: ${res.locals.email}, error: ${err}----`,
+      );
       res.status(501).send();
       console.log(err);
     });

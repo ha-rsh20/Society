@@ -6,6 +6,7 @@ const otpGenerator = require("./generateOTP");
 const dns = require("dns");
 const { gmail } = require("@googleapis/gmail");
 const { OAuth2Client } = require("google-auth-library");
+const logActivity = require("../Util/Logger");
 
 // dns.lookup("smtp.gmail.com", { all: true }, console.log);
 
@@ -135,17 +136,27 @@ const sendEmail = expressAsyncHandler(async (req, res) => {
               "Email sent successfully! Message ID:",
               response.data.id,
             );
+            logActivity(
+              `----Reset email sent successfully to: ${mail_to} with OTP: ${otp}----`,
+            );
             res.status(200).send();
           } catch (error) {
             console.error("Failed to send email via Gmail API:", error);
+            logActivity(
+              `----Failed to send reset email to: ${mail_to} with error: ${error}----`,
+            );
             throw error;
           }
         } else {
           console.log("No user found for reset with email:", mail_to);
+          logActivity(`----No user found for reset with email: ${mail_to}----`);
           res.status(204).send();
         }
       })
       .catch((err) => {
+        logActivity(
+          `----Error finding user for reset with email: ${mail_to}, error: ${err}----`,
+        );
         console.log("Error finding user for reset:", err);
         res.sendStatus(500);
       });
@@ -167,10 +178,16 @@ const sendEmail = expressAsyncHandler(async (req, res) => {
           raw: rawMessage,
         },
       });
+      logActivity(
+        `----OTP email sent successfully to: ${mail_to} with OTP: ${otp}----`,
+      );
       console.log("Email sent successfully! Message ID:", response.data.id);
       res.status(200).send();
     } catch (error) {
       console.error("Failed to send email via Gmail API:", error);
+      logActivity(
+        `----Failed to send OTP email to: ${mail_to} with error: ${error}----`,
+      );
       throw error;
     }
   }
@@ -179,8 +196,14 @@ const sendEmail = expressAsyncHandler(async (req, res) => {
 const verifyOTP = (req, res) => {
   console.log("Verifying OTP:", req.body.otp, "against generated OTP:", otp);
   if (req.body.otp === otp) {
+    logActivity(
+      `----OTP verified successfully for email: ${req.params.mail}----`,
+    );
     res.status(200).send();
   } else {
+    logActivity(
+      `----Failed to verify OTP for email: ${req.params.mail}, provided OTP: ${req.body.otp}, generated OTP: ${otp}----`,
+    );
     res.status(500).send();
   }
 };

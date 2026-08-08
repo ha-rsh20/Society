@@ -1,12 +1,17 @@
 const user = require("../Schema/user");
 const jwt = require("jsonwebtoken");
+const logActivity = require("../Util/Logger");
 
 const isAuthenticated = (req, res, next) => {
   const token = req.headers.cookie?.split("=")[1];
 
+  logActivity(
+    `----Checking authentication for user: ${req.headers.cookie}----`,
+  );
   // console.log("Token from cookie:", token);
 
   if (!token) {
+    logActivity("----No token provided----");
     return res.status(401).send("Unauthorized: No token provided");
   }
 
@@ -15,6 +20,7 @@ const isAuthenticated = (req, res, next) => {
   //console.log("Decoded token:", decoded);
 
   if (!decoded) {
+    logActivity("----Invalid token provided----");
     return res.status(403).send("Forbidden: Invalid token");
   }
 
@@ -24,15 +30,17 @@ const isAuthenticated = (req, res, next) => {
     .findOne({ email: req.user })
     .then((data) => {
       if (!data) {
+        logActivity(`----User not found for email: ${req.user}----`);
         return res.status(404).send("User not found");
       }
     })
     .catch((err) => {
+      logActivity(`----Error finding user: ${err}----`);
       console.log("Error finding user:", err);
       return res.status(500).send("Internal Server Error");
     });
 
-  console.log("User authenticated:", req.user);
+  logActivity(`----User authenticated: ${req.user}----`);
   next();
 };
 

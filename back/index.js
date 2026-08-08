@@ -5,6 +5,7 @@ const memberRoute = require("./Routes/memberRoutes");
 const authRoute = require("./Routes/authRoutes");
 const isAuthenticated = require("./Middleware/Authenticated");
 const cors = require("cors");
+const logActivity = require("./Util/Logger");
 
 const app = express();
 
@@ -27,5 +28,6 @@ app.use("/auth", authRoute);
 
 //Start the Server
 app.listen(8000, () => {
+  logActivity("----Server started----");
   console.log("Server is running on port 8000");
 });
